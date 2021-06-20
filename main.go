@@ -359,7 +359,7 @@ func runNmapTcpVuln(ip string, wg *sync.WaitGroup) {
     // Get the results of the scan
     _, warnings, err := nmapScanner.Run()
     if err != nil {
-        log.Fatal("Nmap Vuln Scripts scan error: ", err)
+        log.Println("Nmap Vuln Scripts scan error: ", err)
     }
 
     if verbose == 1 {
@@ -461,7 +461,7 @@ func runFfuf(ip string, portNumber string, fileName string) {
     url := protocol + ip + ":" + portNumber + "/FUZZ"
     wordlist := "/usr/share/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-small.txt"
     outputFile := "ffuf/" + fileName
-    proCommand := "ffuf -u " + url + " -w " + wordlist + " -o " + cwd + "/" + ip + "/" + outputFile
+    proCommand := "ffuf -u " + url + " -w " + wordlist + "-of csv -o " + cwd + "/" + ip + "/" + outputFile
     proArgs := strings.Split(proCommand, " ")
 
     // Set up the Stdout and Stderr buffers
