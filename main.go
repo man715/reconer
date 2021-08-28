@@ -4,7 +4,7 @@ import (
     "bytes"
     "flag"
     "fmt"
-    "github.com/Ullaakut/nmap"
+    "github.com/Ullaakut/nmap/v2"
     "io/ioutil"
     "log"
     "os"
