@@ -59,8 +59,6 @@ func main() {
     }
 
     flag.Parse()
-    fmt.Println(runUdp)
-    fmt.Println(runVuln)
 
     // Get the current working directory
     cwd, err = os.Getwd()
@@ -461,7 +459,7 @@ func runFfuf(ip string, portNumber string, fileName string) {
     url := protocol + ip + ":" + portNumber + "/FUZZ"
     wordlist := "/usr/share/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-small.txt"
     outputFile := "ffuf/" + fileName
-    proCommand := "ffuf -u " + url + " -w " + wordlist + "-of csv -o " + cwd + "/" + ip + "/" + outputFile
+    proCommand := "ffuf -u " + url + " -w " + wordlist + " -of csv -o " + cwd + "/" + ip + "/" + outputFile
     proArgs := strings.Split(proCommand, " ")
 
     // Set up the Stdout and Stderr buffers
