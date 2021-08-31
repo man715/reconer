@@ -4,4 +4,4 @@ vendor/
 *.prof
 *.txt
 *.swp
-! vendor/README.md
+!vendor/README.md
