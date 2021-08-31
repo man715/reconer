@@ -1,8 +1,5 @@
-reconer.go
-reconer
 *.exe
 *.test
 *.prof
 *.txt
 *.swp
-/vendor/**
