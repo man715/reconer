@@ -5,3 +5,4 @@ reconer
 *.prof
 *.txt
 *.swp
+vendor/*
