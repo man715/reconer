@@ -16,15 +16,6 @@ import (
 	"github.com/Ullaakut/nmap/v2"
 )
 
-// Global Variables
-var heartbeatInterval time.Duration
-var timeout time.Duration
-var cwd string
-var err error
-var verbose int
-var runVuln bool
-var runUdp bool
-
 func main() {
 	// check if running as root
 	//if os.Geteuid() != 0 {
