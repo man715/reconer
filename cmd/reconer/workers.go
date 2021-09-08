@@ -42,22 +42,20 @@ func reconWorker(enumConcurrency int, jobs <-chan string, wg *sync.WaitGroup) {
 
 			// Iterate through each port to create the enumJobList
 			portNumber := strconv.Itoa(int(port.ID))
-			portState := port.State.String()
+      portService := port.Service.Name
 
 			// Populate the enumJobsList
-			if portNumber == "80" && portState == "open" {
-				enumJobsList = append(enumJobsList, "ffuf,"+portNumber)
-				enumJobsList = append(enumJobsList, "nikto,"+portNumber)
-				enumJobsList = append(enumJobsList, "whatweb,"+portNumber)
-			} else if portNumber == "443" && portState == "open" {
-				enumJobsList = append(enumJobsList, "ffuf,"+portNumber)
-				enumJobsList = append(enumJobsList, "nikto,"+portNumber)
-				enumJobsList = append(enumJobsList, "whatweb,"+portNumber)
-			} else if portNumber == "445" && portState == "open" {
-				enumJobsList = append(enumJobsList, "enum4linux, "+portNumber)
-				enumJobsList = append(enumJobsList, "smbmap,"+portNumber)
-				enumJobsList = append(enumJobsList, "smbclient,"+portNumber)
-			}
+      switch portService {
+      case "http","https":
+				enumJobsList = append(enumJobsList, "ffuf,"+portNumber+","+portService)
+				enumJobsList = append(enumJobsList, "nikto,"+portNumber+","+portService)
+				enumJobsList = append(enumJobsList, "whatweb,"+portNumber+","+portService)
+      case "smb":
+				enumJobsList = append(enumJobsList, "enum4linux, "+portNumber+","+portService)
+				enumJobsList = append(enumJobsList, "smbmap,"+portNumber+","+portService)
+				enumJobsList = append(enumJobsList, "smbclient,"+portNumber+","+portService)
+      }
+
 		}
 
 		// Add the port enumeration jobs to the enumJobs que
@@ -95,30 +93,31 @@ func enumWorker(enumJobs <-chan []string, ip string, wg *sync.WaitGroup) {
 	fileName := "result.txt"
 
 	for job := range enumJobs {
-		portNumber := job[1]
 		jobName := job[0]
+		portNumber := job[1]
+    portService := job[2]
 
-		if jobName == "enum4linux" {
-			//run enum4linux
-			runE4l(ip, fileName)
-		} else if jobName == "onesixtyone" {
-			// run onesixtyone
-			// TODO
-		} else if jobName == "ffuf" {
+    switch jobName {
+    case "ffuf":
 			// run ffuf
-			runFfuf(ip, portNumber, portNumber+"-root.csv")
-		} else if jobName == "whatweb" {
+			runFfuf(ip, portService, portNumber, portNumber+"-root.csv")
+    case "whatweb":
 			// run whatweb
-			runWhatweb(ip, portNumber, fileName)
-		} else if jobName == "smbmap" {
+			runWhatweb(ip, portService, portNumber, fileName)
+    case "nikto":
+			// run nikto
+			runNikto(ip, portService, portNumber, fileName)
+    case "smbmap":
 			// run smbmap
 			runSmbmap(ip, fileName)
-		} else if jobName == "smbclient" {
+    case "smbclient":
 			// run smbclient
 			runSmbclient(ip, fileName)
-		} else if jobName == "nikto" {
-			// run nikto
-			runNikto(ip, portNumber, fileName)
-		}
+    case "enum4linux":
+      // run enum4linux
+      runE4l(ip, fileName)
+    case "onesixtyone":
+      // TODO
+    }
 	}
 }
