@@ -1,6 +1,8 @@
 package main
 
-import "time"
+import (
+	"time"
+)
 
 // Global Variables
 var heartbeatInterval time.Duration
@@ -10,3 +12,4 @@ var err error
 var verbose int
 var runVuln bool
 var runUdp bool
+var scanConfig ScanConfig

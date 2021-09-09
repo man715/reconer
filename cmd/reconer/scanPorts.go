@@ -1,118 +1,108 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"log"
-	"sync"
-
-	"github.com/Ullaakut/nmap/v2"
+	"os"
+	"os/exec"
+	"regexp"
+	"strings"
+	"time"
 )
 
-// Run nmap TCP All Ports
-func runNmapTcp(ip string, ports string, fileName string, wg *sync.WaitGroup) ([]nmap.Port, string, error) {
-	// Set all ports as the default scan range
-	if ports == "" {
-		ports = "-65535"
-	}
+func runNmap(target *Target, cmd string, filename string) {
+	command := strings.Split(cmd, " ")
 
-	// Set up the nmap scanner
-	nmapScanner, err := nmap.NewScanner(
-		nmap.WithTargets(ip),
-		nmap.WithPorts(ports),
-		nmap.WithServiceInfo(),
-		nmap.WithDefaultScript(),
-		nmap.WithNmapOutput(fileName),
-		nmap.WithSkipHostDiscovery(),
-		nmap.WithConnectScan(),
-	)
+	// Set up the STDOut and STDErr buffers
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+
+	nmap := exec.Command(command[0], command[1:]...)
+
+	nmap.Stdout = &out
+	nmap.Stderr = &stderr
+
+	err := nmap.Start()
 	if err != nil {
-		return nil, "", err
+		log.Fatal("Could not run nmap: ", err)
 	}
 
-	// Get the results of the scan
-	result, warnings, err := nmapScanner.Run()
-	if err != nil {
-		return nil, "", err
+	// Wait for the process to finish or kill it after timeout
+	done := make(chan error, 1)
+	go func() {
+		done <- nmap.Wait()
+	}()
+
+	// Set default timeout to 600 seconds (10 min)
+	if timeout < 600 {
+		timeout = 600
 	}
 
-	if verbose == 1 {
-		if warnings != nil {
-			log.Println(warnings)
+	// Wait for either the done channel or the timeout to expire
+	select {
+	case <-time.After(timeout * time.Second):
+		err = nmap.Process.Kill()
+		if err != nil {
+			log.Fatal("Failed to kill nmap: ", err)
+		} else {
+			log.Println("nmap killed as timeout reached on ", target.IP)
+		}
+	case err = <-done:
+		if err != nil {
+			log.Printf("nmap completed with an error on %v\n%v\n", target.IP, stderr.String())
+		} else {
+			log.Println("nmap finished successfully on ", target.IP)
 		}
 	}
 
-	var openPorts []nmap.Port
-	var hostAddress nmap.Address
-
-	for _, host := range result.Hosts {
-		openPorts = host.Ports
-		hostAddress = host.Addresses[0]
-	}
-
-	return openPorts, hostAddress.String(), nil
-}
-
-// nmap UDP top 20
-func runNmapUdp(ip string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	fileName := cwd + "/" + ip + "/nmap/udpTop20-defaultScripts.nmap"
-
-	// Set up the nmap scanner
-	nmapScanner, err := nmap.NewScanner(
-		nmap.WithTargets(ip),
-		nmap.WithUDPScan(),
-		nmap.WithServiceInfo(),
-		nmap.WithDefaultScript(),
-		nmap.WithNmapOutput(fileName),
-		nmap.WithSkipHostDiscovery(),
-		nmap.WithConnectScan(),
-		nmap.WithMostCommonPorts(20),
-	)
+	// Load the nmap file
+	file, err := os.Open(target.IP + "/nmap/" + filename)
 	if err != nil {
-		log.Fatal("Nmap UDP scan error: ", err)
+		log.Println(err)
+		log.Fatal("Failed to open the file: " + target.IP + "/namp/" + filename)
 	}
+	defer file.Close()
 
-	// Get the results of the scan
-	_, warnings, err := nmapScanner.Run()
-	if err != nil {
-		log.Fatal("Nmap UDP scan error ", err)
-	}
+	// Set the pattern to find ports and services
+	var pattern string = `^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$`
+	scanner := bufio.NewScanner(file)
+	serviceCounter := 0
+	tmpSlice := make([]TargetService, 0, 100)
+	var tmpService TargetService
 
-	if verbose == 1 {
-		if warnings != nil {
-			log.Println(warnings)
+	for scanner.Scan() {
+		line := scanner.Text()
+		// Scan the file for open ports
+		r := regexp.MustCompile(pattern)
+		match := r.FindStringSubmatch(line)
+		result := make(map[string]string)
+		if match != nil {
+			// Set the result to a map where the capture group and result is stored
+			for i, name := range r.SubexpNames() {
+				if i != 0 && name != "" {
+					result[name] = match[i]
+				}
+			}
+
+			// Create a temp service to put into the tmp Slice
+			tmpSlice = append(tmpSlice, tmpService)
+
+			// If service uses SSL set HasSSL to true
+			r = regexp.MustCompile(`ssl`)
+			hasSSL := r.FindStringSubmatch(result["service"])
+
+			// Populate the Service with the port and service information
+			if hasSSL != nil {
+				tmpSlice[serviceCounter].HasSSL = true
+			}
+			tmpSlice[serviceCounter].ServiceName = result["service"]
+			tmpSlice[serviceCounter].ScanPort = result["port"]
+			tmpSlice[serviceCounter].Protocol = result["protocol"]
+			target.Services = tmpSlice
+			serviceCounter++
 		}
-	}
-}
 
-// nmap vuln scripts TCP
-func runNmapTcpVuln(ip string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	ports := "-65535"
-	fileName := cwd + "/" + ip + "/nmap/tcpAllPorts-vulnScripts.nmap"
-
-	// Set up the nmap scanner
-	nmapScanner, err := nmap.NewScanner(
-		nmap.WithTargets(ip),
-		nmap.WithPorts(ports),
-		nmap.WithServiceInfo(),
-		nmap.WithScripts("vuln"),
-		nmap.WithNmapOutput(fileName),
-		nmap.WithSkipHostDiscovery(),
-		nmap.WithConnectScan(),
-	)
-	if err != nil {
-		log.Fatal("Nmap Vuln Scripts scan error: ", err)
 	}
 
-	// Get the results of the scan
-	_, warnings, err := nmapScanner.Run()
-	if err != nil {
-		log.Println("Nmap Vuln Scripts scan error: ", err)
-	}
-
-	if verbose == 1 {
-		if warnings != nil {
-			log.Println(warnings)
-		}
-	}
 }

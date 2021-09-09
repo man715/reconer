@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"runtime"
 	"time"
 )
 
 // Sets the directory structure for each IP address
-func setDirStruct(ip string) {
+func setDirStruct(target *Target) {
 	dirs := []string{"loot", "exploit", "www", "nmap"}
 	for _, dir := range dirs {
-		err = os.MkdirAll(ip+"/"+dir, 0755)
+		err = os.MkdirAll(target.IP+"/"+dir, 0755)
 		if err != nil {
 			log.Fatal("Could not create the directory: ", err)
 		}
@@ -28,27 +29,27 @@ func heartbeat() {
 	}
 }
 
-fun replaceCmdOptions(target *Target) {
-  patterns := [5]string{
-    "{port}",
-    "{address}",
-    "{protocol}",
-    "{scandir}",
-    "{nmap_extra}",
-  }
+func replaceCmdOptions(target *Target) {
+	patterns := [5]string{
+		"{port}",
+		"{address}",
+		"{protocol}",
+		"{scandir}",
+		"{nmap_extra}",
+	}
 
-  for i, service := range target.Services {
-    for j, scan := range target.Services[i].Scans {
-      for k, command := range target.Services[i].Scans[j].Commands {
-        for _, pattern := range patterns {
-          p := regexp.MustCompile(regexp.QuoteMeta(pattern))
-          switch {
-          case pattern == "{port}":
-            cmd := p.ReplaceAllString(command.(string), strconv.Itoa(service.ScanPort))
-            target.Services[i].Scans[j].Commands[k] = cmd
-          }
-        }
-      }
-    }
-  }
+	for i, service := range target.Services {
+		for j := range target.Services[i].Scans {
+			for k, command := range target.Services[i].Scans[j].Commands {
+				for _, pattern := range patterns {
+					p := regexp.MustCompile(regexp.QuoteMeta(pattern))
+					switch {
+					case pattern == "{port}":
+						cmd := p.ReplaceAllString(command, service.ScanPort)
+						target.Services[i].Scans[j].Commands[k] = cmd
+					}
+				}
+			}
+		}
+	}
 }
