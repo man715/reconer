@@ -1,14 +1,14 @@
 package main
 
 type Target struct {
-	IP       string
-	Services []TargetService
+	IP         string
+	FoundPorts []FoundPort
 }
 
-type TargetService struct {
+type FoundPort struct {
 	ServiceName string
 	ScanPort    string
 	Protocol    string
 	HasSSL      bool
-	Scans       []Scan
+	Service     Service
 }

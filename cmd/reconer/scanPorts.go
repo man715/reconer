@@ -68,8 +68,8 @@ func runNmap(target *Target, cmd string, filename string) {
 	var pattern string = `^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$`
 	scanner := bufio.NewScanner(file)
 	serviceCounter := 0
-	tmpSlice := make([]TargetService, 0, 100)
-	var tmpService TargetService
+	tmpSlice := make([]FoundPort, 0, 100)
+	var tmpService FoundPort
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -99,7 +99,7 @@ func runNmap(target *Target, cmd string, filename string) {
 			tmpSlice[serviceCounter].ServiceName = result["service"]
 			tmpSlice[serviceCounter].ScanPort = result["port"]
 			tmpSlice[serviceCounter].Protocol = result["protocol"]
-			target.Services = tmpSlice
+			target.FoundPorts = tmpSlice
 			serviceCounter++
 		}
 

@@ -72,13 +72,6 @@ func main() {
 	// Start the heartbeat
 	go heartbeat()
 
-	// Create the recon workers
-	for i := 0; i < concurrency; i++ {
-		targetWg.Add(1)
-		go targetWorker(reconJobs, enumConcurrency, &targetWg)
-	}
-
-	// Create the list of IPs for the reconJobs list
 	var ips []string
 	// Create the list from the commandline argument or file
 	if *ipList != "" {
@@ -94,6 +87,19 @@ func main() {
 		// Clean up the list to remove the last item which is a blank space
 		ips = ips[:len(ips)-1]
 	}
+
+	// Set concurrency to the number of IPs if lower than the default or given concurrency
+	if len(ips) < concurrency {
+		concurrency = len(ips)
+	}
+
+	// Create the recon workers
+	for i := 0; i < concurrency; i++ {
+		targetWg.Add(1)
+		go targetWorker(reconJobs, enumConcurrency, &targetWg)
+	}
+
+	// Create the list of IPs for the reconJobs list
 
 	// Populate the reconJobs que
 	for _, ip := range ips {

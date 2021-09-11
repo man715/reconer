@@ -2,17 +2,15 @@
 username_wordlist = '/usr/share/seclists/Usernames/top-usernames-shortlist.txt'
 password_wordlist = '/usr/share/seclists/Passwords/darkweb2017-top100.txt'
 
-[allServices] # Define scans here that you want to run against all services.
+[all-services] # Define scans here that you want to run against all services.
 
 serviceNames = [
     '.+'
 ]
 
-    [[allServices.scan]]
+    [[all-services.scan]]
     name = 'sslscan'
-    commands = [
-				'if [ "{secure}" == "True" ]; then sslscan --show-certificate --no-colour {address}:{port} 2>&1 | tee "{scandir}/{protocol}_{port}_sslscan.txt"; fi'
-		]
+    command = 'bash -c if [ "{secure}" == "True" ]; then sslscan --show-certificate --no-colour {address}:{port} ; fi'
 
 [cassandra]
 
@@ -22,9 +20,7 @@ serviceNames = [
 
     [[cassandra.scan]]
     name = 'nmap-cassandra'
-    commands = [
-				'nmap {nmap_extra} -sV  -p {port} --script="banner,(cassandra* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_cassandra_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_cassandra_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV  -p {port} --script="banner,(cassandra* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_cassandra_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_cassandra_nmap.xml" {address}'
 
 [cups]
 
@@ -34,9 +30,7 @@ serviceNames = [
 
     [[cups.scan]]
     name = 'nmap-cups'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(cups* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_cups_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_cups_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(cups* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_cups_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_cups_nmap.xml" {address}'
 
 [distcc]
 
@@ -46,9 +40,7 @@ serviceNames = [
 
     [[distcc.scan]]
     name = 'nmap-distcc'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,distcc-cve2004-2687" --script-args="distcc-cve2004-2687.cmd=id" -oN "{scandir}/{protocol}_{port}_distcc_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_distcc_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,distcc-cve2004-2687" --script-args="distcc-cve2004-2687.cmd=id" -oN "{scandir}/{protocol}_{port}_distcc_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_distcc_nmap.xml" {address}'
 
 [dns]
 
@@ -58,9 +50,7 @@ serviceNames = [
 
     [[dns.scan]]
     name = 'nmap-dns'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(dns* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_dns_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_dns_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(dns* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_dns_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_dns_nmap.xml" {address}'
 
 [finger]
 
@@ -70,9 +60,7 @@ serviceNames = [
 
     [[finger.scan]]
     name = 'nmap-finger'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,finger" -oN "{scandir}/{protocol}_{port}_finger_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_finger_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,finger" -oN "{scandir}/{protocol}_{port}_finger_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_finger_nmap.xml" {address}'
 
 [ftp]
 
@@ -83,9 +71,7 @@ serviceNames = [
 
     [[ftp.scan]]
     name = 'nmap-ftp'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(ftp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_ftp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_ftp_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(ftp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_ftp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_ftp_nmap.xml" {address}'
 
         [[ftp.scan.pattern]]
         description = 'Anonymous FTP Enabled!'
@@ -110,9 +96,7 @@ ignore-serviceNames = [
 
     [[http.scan]]
     name = 'nmap-http'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(http* or ssl*) and not (brute or broadcast or dos or external or http-slowloris* or fuzzer)" -oN "{scandir}/{protocol}_{port}_http_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_{scheme}_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(http* or ssl*) and not (brute or broadcast or dos or external or http-slowloris* or fuzzer)" -oN "{scandir}/{protocol}_{port}_http_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_{scheme}_nmap.xml" {address}'
 
         [[http.scan.pattern]]
         description = 'Identified HTTP Server: {match}'
@@ -124,41 +108,31 @@ ignore-serviceNames = [
 
     [[http.scan]]
     name = 'curl-index'
-    commands = [
-				'curl -sSik {scheme}://{address}:{port}/ -m 10 2>&1 | tee "{scandir}/{protocol}_{port}_{scheme}_index.html"'
-		]
+    command = 'curl -sSik {scheme}://{address}:{port}/ -m 10 '
 
         [[http.scan.pattern]]
         pattern = '(?i)Powered by [^\n]+'
 
     [[http.scan]]
     name = 'curl-robots'
-    commands = [
-				'curl -sSik {scheme}://{address}:{port}/robots.txt -m 10 2>&1 | tee "{scandir}/{protocol}_{port}_{scheme}_robots.txt"'
-		]
+    command = 'curl -sSik {scheme}://{address}:{port}/robots.txt -m 10 '
 
     [[http.scan]]
     name = 'wkhtmltoimage'
-    commands = [
-				'if hash wkhtmltoimage 2> /dev/null; then wkhtmltoimage --format png {scheme}://{address}:{port}/ {scandir}/{protocol}_{port}_{scheme}_screenshot.png; fi'
-		]
+    command = 'bash -c if hash wkhtmltoimage 2> /dev/null; then wkhtmltoimage --format png {scheme}://{address}:{port}/ {scandir}/{protocol}_{port}_{scheme}_screenshot.png; fi'
 
     [[http.scan]]
     name = 'whatweb'
-    commands = [
-				'whatweb --color=never --no-errors -a 3 -v {scheme}://{address}:{port} 2>&1 | tee "{scandir}/{protocol}_{port}_{scheme}_whatweb.txt"'
-		]
+    command = 'whatweb --color=never --no-errors -a 3 -v {scheme}://{address}:{port} '
 
     [[http.scan]]
     name = 'feroxbuster'
-    commands = [
-				'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n -o {scandir}/{protocol}_{port}_{scheme}_feroxbuster.txt'
-		]
+    command = 'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n -o {scandir}/{protocol}_{port}_{scheme}_feroxbuster.txt'
 
     [[http.manual]]
     description = '(nikto) old but generally reliable web server enumeration tool'
     commands = [
-        'nikto -ask=no -h {scheme}://{address}:{port} 2>&1 | tee "{scandir}/{protocol}_{port}_{scheme}_nikto.txt"'
+        'nikto -ask=no -h {scheme}://{address}:{port} '
     ]
 
     [[http.manual]]
@@ -199,7 +173,7 @@ ignore-serviceNames = [
     [[http.manual]]
     description = '(wpscan) WordPress Security Scanner (useful if WordPress is found):'
     commands = [
-        'wpscan --url {scheme}://{address}:{port}/ --no-update -e vp,vt,tt,cb,dbe,u,m --plugins-detection aggressive --plugins-version-detection aggressive -f cli-no-color 2>&1 | tee "{scandir}/{protocol}_{port}_{scheme}_wpscan.txt"'
+        'wpscan --url {scheme}://{address}:{port}/ --no-update -e vp,vt,tt,cb,dbe,u,m --plugins-detection aggressive --plugins-version-detection aggressive -f cli-no-color '
     ]
 
     [[http.manual]]
@@ -219,9 +193,7 @@ serviceNames = [
 
     [[imap.scan]]
     name = 'nmap-imap'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(imap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_imap_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_imap_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(imap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_imap_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_imap_nmap.xml" {address}'
 
 [kerberos]
 
@@ -232,9 +204,7 @@ serviceNames = [
 
     [[kerberos.scan]]
     name = 'nmap-kerberos'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,krb5-enum-users" -oN "{scandir}/{protocol}_{port}_kerberos_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_kerberos_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,krb5-enum-users" -oN "{scandir}/{protocol}_{port}_kerberos_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_kerberos_nmap.xml" {address}'
 
 [ldap]
 
@@ -244,15 +214,11 @@ serviceNames = [
 
     [[ldap.scan]]
     name = 'nmap-ldap'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(ldap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_ldap_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_ldap_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(ldap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_ldap_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_ldap_nmap.xml" {address}'
 
     [[ldap.scan]]
     name = 'enum4linux'
-    commands = [
-				'enum4linux -a -M -l -d {address} 2>&1 | tee "{scandir}/enum4linux.txt"'
-		]
+    command = 'enum4linux -a -M -l -d {address} '
     run_once = true
     ports.tcp = [139, 389, 445]
     ports.udp = [137]
@@ -260,7 +226,7 @@ serviceNames = [
     [[ldap.manual]]
     description = 'ldapsearch command (modify before running)'
     commands = [
-        'ldapsearch -x -D "<username>" -w "<password>"" -p {port} -h {address} -b "dc=example,dc=com" -s sub "(objectclass=*) 2>&1 | tee > "{scandir}/{protocol}_{port}_ldap_all-entries.txt"'
+        'ldapsearch -x -D "<username>" -w "<password>"" -p {port} -h {address} -b "dc=example,dc=com" -s sub "(objectclass=*) '
     ]
 
 [mongodb]
@@ -271,9 +237,7 @@ serviceNames = [
 
     [[mongodb.scan]]
     name = 'nmap-mongodb'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(mongodb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_mongodb_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_mongodb_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(mongodb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_mongodb_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_mongodb_nmap.xml" {address}'
 
 [mssql]
 
@@ -284,9 +248,7 @@ serviceNames = [
 
     [[mssql.scan]]
     name = 'nmap-mssql'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(ms-sql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args="mssql.instance-port={port},mssql.username=sa,mssql.password=sa" -oN "{scandir}/{protocol}_{port}_mssql_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_mssql_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(ms-sql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args="mssql.instance-port={port},mssql.username=sa,mssql.password=sa" -oN "{scandir}/{protocol}_{port}_mssql_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_mssql_nmap.xml" {address}'
 
     [[mssql.manual]]
     description = '(sqsh) interactive database shell'
@@ -302,9 +264,7 @@ serviceNames = [
 
     [[mysql.scan]]
     name = 'nmap-mysql'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_mysql_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_mysql_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_mysql_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_mysql_nmap.xml" {address}'
 
 [nfs]
 
@@ -315,15 +275,11 @@ serviceNames = [
 
     [[nfs.scan]]
     name = 'nmap-nfs'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_nfs_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_nfs_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_nfs_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_nfs_nmap.xml" {address}'
 
     [[nfs.scan]]
     name = 'showmount'
-    commands = [
-				'showmount -e {address} 2>&1 | tee "{scandir}/{protocol}_{port}_showmount.txt"'
-		]
+    command = 'showmount -e {address} '
 
 [nntp]
 
@@ -333,9 +289,7 @@ serviceNames = [
 
     [[nntp.scan]]
     name = 'nmap-nntp'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,nntp-ntlm-info" -oN "{scandir}/{protocol}_{port}_nntp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_nntp_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,nntp-ntlm-info" -oN "{scandir}/{protocol}_{port}_nntp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_nntp_nmap.xml" {address}'
 
 [oracle]
 
@@ -345,39 +299,27 @@ serviceNames = [
 
     [[oracle.scan]]
     name = 'nmap-oracle'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(oracle* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_oracle_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_oracle_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(oracle* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_oracle_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_oracle_nmap.xml" {address}'
 
     [[oracle.scan]]
     name = 'oracle-tnscmd-ping'
-    commands = [
-				'tnscmd10g ping -h {address} -p {port} 2>&1 | tee "{scandir}/{protocol}_{port}_oracle_tnscmd_ping.txt"'
-		]
+    command = 'tnscmd10g ping -h {address} -p {port} '
 
     [[oracle.scan]]
     name = 'oracle-tnscmd-version'
-    commands = [
-				'tnscmd10g version -h {address} -p {port} 2>&1 | tee "{scandir}/{protocol}_{port}_oracle_tnscmd_version.txt"'
-		]
+    command = 'tnscmd10g version -h {address} -p {port} '
 
     [[oracle.scan]]
     name = 'oracle-tnscmd-version'
-    commands = [
-				'tnscmd10g version -h {address} -p {port} 2>&1 | tee "{scandir}/{protocol}_{port}_oracle_tnscmd_version.txt"'
-		]
+    command = 'tnscmd10g version -h {address} -p {port} '
 
     [[oracle.scan]]
     name = 'oracle-scanner'
-    commands = [
-				'oscanner -v -s {address} -P {port} 2>&1 | tee "{scandir}/{protocol}_{port}_oracle_scanner.txt"'
-		]
+    command = 'oscanner -v -s {address} -P {port} '
 
     [[oracle.manual]]
     description = 'Brute-force SIDs using Nmap'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,oracle-sid-brute" -oN "{scandir}/{protocol}_{port}_oracle_sid-brute_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_oracle_sid-brute_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,oracle-sid-brute" -oN "{scandir}/{protocol}_{port}_oracle_sid-brute_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_oracle_sid-brute_nmap.xml" {address}'
 
     [[oracle.manual]]
     description = 'Install ODAT (https://github.com/quentinhardy/odat) and run the following commands:'
@@ -404,9 +346,7 @@ serviceNames = [
 
     [[pop3.scan]]
     name = 'nmap-pop3'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(pop3* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_pop3_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_pop3_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(pop3* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_pop3_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_pop3_nmap.xml" {address}'
 
 [rdp]
 
@@ -418,9 +358,7 @@ serviceNames = [
 
     [[rdp.scan]]
     name = 'nmap-rdp'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(rdp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_rdp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_rdp_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(rdp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_rdp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_rdp_nmap.xml" {address}'
 
     [[rdp.manual]]
     description = 'Bruteforce logins:'
@@ -438,9 +376,7 @@ serviceNames = [
 
     [[rmi.scan]]
     name = 'nmap-rmi'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,rmi-vuln-classloader,rmi-dumpregistry" -oN "{scandir}/{protocol}_{port}_rmi_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_rmi_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,rmi-vuln-classloader,rmi-dumpregistry" -oN "{scandir}/{protocol}_{port}_rmi_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_rmi_nmap.xml" {address}'
 
 [rpc]
 
@@ -452,9 +388,7 @@ serviceNames = [
 
     [[rpc.scan]]
     name = 'nmap-msrpc'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,msrpc-enum,rpc-grind,rpcinfo" -oN "{scandir}/{protocol}_{port}_rpc_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_rpc_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,msrpc-enum,rpc-grind,rpcinfo" -oN "{scandir}/{protocol}_{port}_rpc_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_rpc_nmap.xml" {address}'
 
     [[rpc.manual]]
     description = 'RPC Client:'
@@ -470,15 +404,11 @@ serviceNames = [
 
     [[sip.scan]]
     name = 'nmap-sip'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,sip-enum-users,sip-methods" -oN "{scandir}/{protocol}_{port}_sip_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_sip_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,sip-enum-users,sip-methods" -oN "{scandir}/{protocol}_{port}_sip_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_sip_nmap.xml" {address}'
 
     [[sip.scan]]
     name = 'svwar'
-    commands = [
-				'svwar -D -m INVITE -p {port} {address}'
-		]
+    command = 'svwar -D -m INVITE -p {port} {address}'
 
 [ssh]
 
@@ -488,9 +418,7 @@ serviceNames = [
 
     [[ssh.scan]]
     name = 'nmap-ssh'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,ssh2-enum-algos,ssh-hostkey,ssh-auth-methods" -oN "{scandir}/{protocol}_{port}_ssh_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_ssh_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,ssh2-enum-algos,ssh-hostkey,ssh-auth-methods" -oN "{scandir}/{protocol}_{port}_ssh_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_ssh_nmap.xml" {address}'
 
     [[ssh.manual]]
     description = 'Bruteforce logins:'
@@ -508,52 +436,38 @@ serviceNames = [
 
     [[smb.scan]]
     name = 'nmap-smb'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(nbstat or smb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args="unsafe=1" -oN "{scandir}/{protocol}_{port}_smb_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_smb_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(nbstat or smb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args="unsafe=1" -oN "{scandir}/{protocol}_{port}_smb_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_smb_nmap.xml" {address}'
 
     [[smb.scan]]
     name = 'enum4linux'
-    commands = [
-				'enum4linux -a -M -l -d {address} 2>&1 | tee "{scandir}/enum4linux.txt"'
-		]
+    command = 'enum4linux -a -M -l -d {address} '
     run_once = true
     ports.tcp = [139, 389, 445]
     ports.udp = [137]
 
     [[smb.scan]]
     name = 'nbtscan'
-    commands = [
-				'nbtscan -rvh {address} 2>&1 | tee "{scandir}/nbtscan.txt"'
-		]
+    command = 'nbtscan -rvh {address} '
     run_once = true
     ports.udp = [137]
 
     [[smb.scan]]
     name = 'smbclient'
-    commands = [
-				'smbclient -L\\ -N -I {address} 2>&1 | tee "{scandir}/smbclient.txt"'
-		]
+    command = 'smbclient -L\\ -N -I {address} '
     run_once = true
     ports.tcp = [139, 445]
 
     [[smb.scan]]
     name = 'smbmap-share-permissions'
-    commands = [
-				'smbmap -H {address} -P {port} 2>&1 | tee -a "{scandir}/smbmap-share-permissions.txt"; smbmap -u null -p "" -H {address} -P {port} 2>&1 | tee -a "{scandir}/smbmap-share-permissions.txt"'
-		]
+    command = 'smbmap -H {address} -P {port} '
 
     [[smb.scan]]
     name = 'smbmap-list-contents'
-    commands = [
-				'smbmap -H {address} -P {port} -R 2>&1 | tee -a "{scandir}/smbmap-list-contents.txt"; smbmap -u null -p "" -H {address} -P {port} -R 2>&1 | tee -a "{scandir}/smbmap-list-contents.txt"'
-		]
+    command = 'smbmap -H {address} -P {port} -R '
 
     [[smb.scan]]
     name = 'smbmap-execute-command'
-    commands = [
-				'smbmap -H {address} -P {port} -x "ipconfig /all" 2>&1 | tee -a "{scandir}/smbmap-execute-command.txt"; smbmap -u null -p "" -H {address} -P {port} -x "ipconfig /all" 2>&1 | tee -a "{scandir}/smbmap-execute-command.txt"'
-		]
+    command = 'smbmap -H {address} -P {port} -x "ipconfig /all" '
 
     [[smb.manual]]
     description = 'Nmap scans for SMB vulnerabilities that could potentially cause a DoS if scanned (according to Nmap). Be careful:'
@@ -571,15 +485,11 @@ serviceNames = [
 
     [[smtp.scan]]
     name = 'nmap-smtp'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(smtp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_smtp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_smtp_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(smtp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_smtp_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_smtp_nmap.xml" {address}'
 
     [[smtp.scan]]
     name = 'smtp-user-enum'
-    commands = [
-				'smtp-user-enum -M VRFY -U "{username_wordlist}" -t {address} -p {port} 2>&1 | tee "{scandir}/{protocol}_{port}_smtp_user-enum.txt"'
-		]
+    command = 'smtp-user-enum -M VRFY -U "{username_wordlist}" -t {address} -p {port} '
 
 [snmp]
 
@@ -589,79 +499,59 @@ serviceNames = [
 
     [[snmp.scan]]
     name = 'nmap-snmp'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(snmp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_snmp-nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_snmp_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(snmp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "{scandir}/{protocol}_{port}_snmp-nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_snmp_nmap.xml" {address}'
 
     [[snmp.scan]]
     name = 'onesixtyone'
-    commands = [
-				'onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt -dd {address} 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_onesixtyone.txt"'
-		]
+    command = 'onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt -dd {address} '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk-system-processes'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.1.6.0 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk_system_processes.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.1.6.0 '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk-running-processes'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.4.2.1.2 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk_running_processes.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.4.2.1.2 '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk-process-paths'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.4.2.1.4 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk_process_paths.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.4.2.1.4 '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk-storage-units'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.2.3.1.4 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk_storage_units.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.2.3.1.4 '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk-software-names'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.6.3.1.2 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk_software_names.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.25.6.3.1.2 '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk-user-accounts'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 1.3.6.1.4.1.77.1.2.25 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk_user_accounts.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} 1.3.6.1.4.1.77.1.2.25 '
     run_once = true
     ports.udp = [161]
 
     [[snmp.scan]]
     name = 'snmpwalk-tcp-ports'
-    commands = [
-				'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.6.13.1.3 2>&1 | tee "{scandir}/{protocol}_{port}_snmp_snmpwalk_tcp_ports.txt"'
-		]
+    command = 'snmpwalk -c public -v 1 {address} 1.3.6.1.2.1.6.13.1.3 '
     run_once = true
     ports.udp = [161]
 
@@ -673,9 +563,7 @@ serviceNames = [
 
     [[telnet.scan]]
     name = 'nmap-telnet'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,telnet-encryption,telnet-ntlm-info" -oN "{scandir}/{protocol}_{port}_telnet-nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_telnet_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,telnet-encryption,telnet-ntlm-info" -oN "{scandir}/{protocol}_{port}_telnet-nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_telnet_nmap.xml" {address}'
 
 [tftp]
 
@@ -685,9 +573,7 @@ serviceNames = [
 
     [[tftp.scan]]
     name = 'nmap-tftp'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,tftp-enum" -oN "{scandir}/{protocol}_{port}_tftp-nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_tftp_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,tftp-enum" -oN "{scandir}/{protocol}_{port}_tftp-nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_tftp_nmap.xml" {address}'
 
 [vnc]
 
@@ -697,7 +583,5 @@ serviceNames = [
 
     [[vnc.scan]]
     name = 'nmap-vnc'
-    commands = [
-				'nmap {nmap_extra} -sV -p {port} --script="banner,(vnc* or realvnc* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args="unsafe=1" -oN "{scandir}/{protocol}_{port}_vnc_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_vnc_nmap.xml" {address}'
-		]
+    command = 'nmap {nmap_extra} -sV -p {port} --script="banner,(vnc* or realvnc* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args="unsafe=1" -oN "{scandir}/{protocol}_{port}_vnc_nmap.txt" -oX "{scandir}/xml/{protocol}_{port}_vnc_nmap.xml" {address}'
 
