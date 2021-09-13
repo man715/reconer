@@ -16,7 +16,7 @@ import (
 
 // Sets the directory structure for each IP address
 func setDirStruct(target *Target) {
-	dirs := []string{"loot", "exploit", "www", "nmap"}
+	dirs := []string{"loot", "exploit", "www", "scans/xml"}
 	for _, dir := range dirs {
 		err = os.MkdirAll(target.IP+"/"+dir, 0755)
 		if err != nil {
@@ -30,17 +30,19 @@ func heartbeat() {
 	for {
 		timer := time.After(time.Second * heartbeatInterval)
 		<-timer
-		fmt.Printf("There are %d goroutines running\n", runtime.NumGoroutine())
+		log.Printf("There are %d goroutines running\n", runtime.NumGoroutine())
 	}
 }
 
 func replacePlaceHolders(command string, port string, ip string, protocol string, directory string, hasSSL bool) string {
-	patterns := [6]string{
+	patterns := [8]string{
 		"{port}",
 		"{address}",
 		"{protocol}",
 		"{scandir}",
 		"{scheme}",
+		"{usernameWordlist}",
+		"{passwordWordlist}",
 		"{nmap_extra}",
 	}
 
@@ -78,8 +80,9 @@ func replaceCmdOptions(target *Target) {
 
 	// Replace the scan commands
 	for i, service := range target.FoundPorts {
-		for _, scan := range target.FoundPorts[i].Service.Scans {
-			replacePlaceHolders(scan.Command, service.ScanPort, target.IP, service.Protocol, cwd+"/"+target.IP+"/", service.HasSSL)
+		for j, scan := range target.FoundPorts[i].Service.Scans {
+			cmd := replacePlaceHolders(scan.Command, service.ScanPort, target.IP, service.Protocol, cwd+"/"+target.IP+"/scans", service.HasSSL)
+			target.FoundPorts[i].Service.Scans[j].Command = cmd
 		}
 	}
 
@@ -87,8 +90,9 @@ func replaceCmdOptions(target *Target) {
 
 	for i, service := range target.FoundPorts {
 		for j := range target.FoundPorts[i].Service.Manuals {
-			for _, command := range target.FoundPorts[i].Service.Manuals[j].Commands {
-				replacePlaceHolders(command, service.ScanPort, target.IP, service.Protocol, cwd+"/"+target.IP+"/", service.HasSSL)
+			for k, command := range target.FoundPorts[i].Service.Manuals[j].Commands {
+				cmd := replacePlaceHolders(command, service.ScanPort, target.IP, service.Protocol, cwd+"/"+target.IP+"/", service.HasSSL)
+				target.FoundPorts[i].Service.Manuals[j].Commands[k] = cmd
 			}
 		}
 	}
@@ -192,17 +196,43 @@ func insertServiceInfo(target *Target) {
 
 }
 
+func removeQuotes(s string) string {
+	if len(s) > 0 && s[0] == '"' {
+		s = s[1:]
+	}
+	if len(s) > 0 && s[len(s)-1] == '"' {
+		s = s[:len(s)-1]
+	}
+	return s
+}
+
+func splitCommand(command string) []string {
+	quoted := false
+	a := strings.FieldsFunc(command, func(r rune) bool {
+		if r == '"' {
+			quoted = !quoted
+		}
+		return !quoted && r == ' '
+	})
+	for i, s := range a {
+		a[i] = removeQuotes(s)
+	}
+	return a
+}
+
 func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]interface{}, errStream chan<- map[string]interface{}, target *Target, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	ip := target.IP
-
 	for job := range enumJobs {
 		for name, command := range job {
 			var out bytes.Buffer
 			var stderr bytes.Buffer
-			progAndArgs := strings.Split(command, " ")
+			progAndArgs := splitCommand(command)
 
+			if progAndArgs[0] == "nmap" {
+				fmt.Printf("%#v", progAndArgs)
+			}
 			prog := progAndArgs[0]
 			tmpArgs := progAndArgs[1:]
 			args := []string{}
@@ -213,7 +243,7 @@ func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]i
 			} else {
 				args = tmpArgs
 			}
-			//fmt.Printf("Running: %v %v\n", prog, args)
+			log.Printf("Running: %v %v\n", prog, args)
 			cmd := exec.Command(prog, args...)
 			cmd.Stdout = &out
 			cmd.Stderr = &stderr
@@ -243,12 +273,10 @@ func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]i
 					log.Println("Failed to kill", prog)
 					log.Fatal(err)
 				} else {
-					log.Println(prog + " finished successfully on " + ip)
+					log.Println(prog + " timed out " + ip)
 				}
 			case err = <-done:
 				if err != nil {
-					//log.Println(prog + " finished with error(s) on " + ip)
-					//log.Println(cmd.Stderr)
 					cmdOutput := make(map[string]interface{})
 					cmdErr := make(map[string]interface{})
 					cmdOutput[name] = cmd.Stdout
@@ -256,7 +284,7 @@ func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]i
 					outStream <- cmdOutput
 					errStream <- cmdErr
 				} else {
-					log.Println(prog + " finished on " + ip)
+					log.Println(prog + args[0] + " finished on " + ip)
 					cmdOutput := make(map[string]interface{})
 					cmdOutput[name] = cmd.Stdout
 					outStream <- cmdOutput
@@ -268,21 +296,32 @@ func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]i
 	}
 }
 
+func generateServiceSummary(target *Target) {
+	output := "# " + target.IP + " #\n\n"
+	output = output + "| Port | Service | Version |\n"
+	output = output + "|------|---------|---------|"
+	for _, service := range target.FoundPorts {
+		output = output + "\n| " + service.ScanPort + " | " + service.ServiceName + " | " + service.Version + " |"
+	}
+	outDir := cwd + "/" + target.IP + "/"
+	filename := "summary.md"
+	simpleWriteFile(outDir, output, filename)
+}
+
 func writeFile(streamType string, outStream <-chan map[string]interface{}, target *Target, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for outContent := range outStream {
 		for name, output := range outContent {
-			switch name {
-			case "manual":
-				fmt.Println(name, output)
+			if name == "manual" {
 				output = output.(string) + "\n"
-			default:
-				continue
 			}
-			outFilename := name + "_" + streamType + "_" + target.IP + ".txt"
-			outputDir := cwd + "/" + target.IP + "/"
+			outFilename := name + ".txt"
+			if streamType == "err" {
+				outFilename = "err_" + outFilename
+			}
+			outputDir := cwd + "/" + target.IP + "/scans/"
 			// Crete the files or append if they already exist
-			outFile, err := os.OpenFile(outputDir+outFilename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0755)
+			outFile, err := os.OpenFile(outputDir+outFilename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			if err != nil {
 				log.Fatal("Could not create the output file " + outputDir + outFilename)
 			}
@@ -292,6 +331,17 @@ func writeFile(streamType string, outStream <-chan map[string]interface{}, targe
 				log.Fatal(err)
 			}
 		}
+	}
+}
+
+func simpleWriteFile(outputDir string, output string, filename string) {
+	outFile, err := os.OpenFile(outputDir+filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal("Could not load file:", outputDir+filename, err)
+	}
+	_, err = outFile.WriteString(output)
+	if err != nil {
+		log.Fatal("Could not write to file", outputDir+filename, err)
 	}
 }
 

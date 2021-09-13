@@ -1,17 +1,15 @@
 package main
 
 import (
-	"log"
-	"os"
 	"sync"
 )
 
 // Worker for each IP address to have recon done on
 func targetWorker(jobs <-chan *Target, enumConcurrency int, wg *sync.WaitGroup) {
 	defer wg.Done()
-
 	for target := range jobs {
 		setDirStruct(target)
+		scanDir := cwd + "/" + target.IP + "/scans/"
 
 		var writerWg sync.WaitGroup
 		writerWg.Add(2)
@@ -20,19 +18,13 @@ func targetWorker(jobs <-chan *Target, enumConcurrency int, wg *sync.WaitGroup) 
 		go writeFile("results", outStream, target, &writerWg)
 		go writeFile("err", errStream, target, &writerWg)
 
-		// TCP All PLUS OS DETECTION SCAN
-		log.Println("Starting nmap scan all ports and OS detection on", target.IP)
-		filename := "fullTCP.nmap"
-		cmd := "nmap -A --osscan-guess --version-all -p- -oN " + target.IP + "/nmap/" + filename + " " + target.IP
-		runNmap(target, cmd, filename)
-
-		if os.Getuid() == 0 {
-			// UDP TOP 20 WITH SERVICE DETECTION
-			log.Println("Starting nmap scan top 20 UDP ports on", target.IP)
-			filename = "top20UDP.nmap"
-			cmd = "nmap -sU -A --top-ports=20 --version-all -oN " + target.IP + "/nmap/" + filename + " " + target.IP
-			runNmap(target, cmd, filename)
+		for _, scan := range portScanConfig.Default.Scans {
+			cmd := replacePlaceHolders(scan.Command, "", target.IP, "", scanDir, false)
+			runNmap(target, cmd, scan.Name, scanDir)
 		}
+
+		generateServiceSummary(target)
+
 		enumWorker(target, enumConcurrency, outStream, errStream)
 		close(outStream)
 		close(errStream)
@@ -56,7 +48,6 @@ func enumWorker(target *Target, enumConcurrency int, outStream chan map[string]i
 	var enumWg sync.WaitGroup
 	// Set up channel
 	enumJobs := make(chan map[string]string, 20)
-
 	for i := 0; i < enumConcurrency; i++ {
 		enumWg.Add(1)
 		go runCommand(enumJobs, outStream, errStream, target, &enumWg)
@@ -72,6 +63,10 @@ func enumWorker(target *Target, enumConcurrency int, outStream chan map[string]i
 
 		counter := 0
 		for _, manualCommands := range foundPort.Service.Manuals {
+			writeDescription := make(map[string]interface{})
+			writeDescription[filename] = "\n\n********************Description*******************\n" + manualCommands.Description + "\n**************************************************"
+
+			manualStream <- writeDescription
 			for _, manualCommand := range manualCommands.Commands {
 				writeCommand := make(map[string]interface{})
 				writeCommand[filename] = manualCommand

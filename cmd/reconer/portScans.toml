@@ -1,0 +1,36 @@
+[default]
+
+        [[default.scan]]
+				name = "nmapFullTCPServiceDetection"
+        command = "nmap {nmap_extra} -sC -sV -A --osscan-guess --version-all -p- {address}"
+        pattern = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
+
+        [[default.scan]]
+				name = "nmapTop20UDPServiceDetection"
+        command = "nmap {nmap_extra} -sU -A --top-ports=20 --version-all {address}"
+        pattern = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
+
+[quick]
+
+        [[quick.scan]]
+				name = "nmapQuickServiceDetection"
+        command = "nmap {nmap_extra} -sV --version-all {address}"
+        pattern = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
+
+        [[quick.scan]]
+				name = "nmapTop20UDPServiceDetection"
+        command = "nmap {nmap_extra} -sU -A --top-ports=20 --version-all {address}"
+        pattern = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
+
+[udp]
+
+        [[udp.scan]]
+				name = "unicornscanUDPTop20PortScan"
+        command = "unicornscan -mU -p 631,161,137,123,138,1434,445,135,67,53,139,500,68,520,1900,4500,514,49152,162,69 {address}"
+        pattern = '^UDP open\s*[\w-]+\[\s*(?P<port>\d+)\].*$'
+
+        [[udp.scan]]
+				name = "nmapUDPTop20ServiceDetection"
+        command = "nmap {nmap_extra} -sU -A -p {ports} --version-all {address}"
+        pattern = '^(?P<port>\d+)\/(?P<protocol>(udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
+

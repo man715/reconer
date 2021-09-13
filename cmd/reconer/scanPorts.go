@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -11,7 +12,7 @@ import (
 	"time"
 )
 
-func runNmap(target *Target, cmd string, filename string) {
+func runNmap(target *Target, cmd string, filename string, scanDir string) {
 	command := strings.Split(cmd, " ")
 
 	// Set up the STDOut and STDErr buffers
@@ -56,16 +57,19 @@ func runNmap(target *Target, cmd string, filename string) {
 		}
 	}
 
+	simpleWriteFile(scanDir, fmt.Sprint(nmap.Stdout), filename)
+	simpleWriteFile(scanDir, fmt.Sprint(nmap.Stderr), "err_"+filename)
+
 	// Load the nmap file
-	file, err := os.Open(target.IP + "/nmap/" + filename)
+	file, err := os.Open(scanDir + filename)
 	if err != nil {
 		log.Println(err)
-		log.Fatal("Failed to open the file: " + target.IP + "/namp/" + filename)
+		log.Fatal("Failed to open the file: " + scanDir + filename)
 	}
 	defer file.Close()
 
 	// Set the pattern to find ports and services
-	var pattern string = `^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$`
+	var pattern string = `^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(?P<version>.*)$`
 	scanner := bufio.NewScanner(file)
 	serviceCounter := 0
 	tmpSlice := make([]FoundPort, 0, 100)
@@ -99,6 +103,7 @@ func runNmap(target *Target, cmd string, filename string) {
 			tmpSlice[serviceCounter].ServiceName = result["service"]
 			tmpSlice[serviceCounter].ScanPort = result["port"]
 			tmpSlice[serviceCounter].Protocol = result["protocol"]
+			tmpSlice[serviceCounter].Version = result["version"]
 			target.FoundPorts = tmpSlice
 			serviceCounter++
 		}

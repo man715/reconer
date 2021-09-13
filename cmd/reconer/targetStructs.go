@@ -9,6 +9,7 @@ type FoundPort struct {
 	ServiceName string
 	ScanPort    string
 	Protocol    string
+	Version     string
 	HasSSL      bool
 	Service     Service
 }

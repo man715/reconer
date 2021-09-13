@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+	// Set up configs
 	scanConfigViper := viper.New()
 	scanConfigViper.SetConfigName("serviceScans")
 	scanConfigViper.AddConfigPath(".")
@@ -22,6 +23,21 @@ func main() {
 		log.Fatal(err)
 	}
 	scanConfigViper.Unmarshal(&scanConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	portScanConfigViper := viper.New()
+	portScanConfigViper.SetConfigName("portScans")
+	portScanConfigViper.AddConfigPath(".")
+	err = portScanConfigViper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = portScanConfigViper.Unmarshal(&portScanConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Set up arguments
 	var concurrency int

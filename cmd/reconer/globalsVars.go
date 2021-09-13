@@ -13,3 +13,4 @@ var verbose int
 var runVuln bool
 var runUdp bool
 var scanConfig ScanConfig
+var portScanConfig PortScanConfig
