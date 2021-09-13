@@ -2,7 +2,7 @@
 
         [[default.scan]]
 				name = "nmapFullTCPServiceDetection"
-        command = "nmap {nmap_extra} -sC -sV -A --osscan-guess --version-all -p- {address}"
+        command = "nmap {nmap_extra} -sC -sV -A --osscan-guess --version-all -p 80,443 {address}"
         pattern = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
 
         [[default.scan]]

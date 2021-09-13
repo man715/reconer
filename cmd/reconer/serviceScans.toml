@@ -20,7 +20,7 @@ serviceNames = [
 
 [[cassandra.scan]]
 name = 'nmap-cassandra'
-command = 'nmap {nmap_extra} -sV  -p {port} --script "banner,(cassandra* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_cassandra_nmap.txt -oX {scandir}/xml/{protocol}_{port}_cassandra_nmap.xml {address}'
+command = 'nmap {nmap_extra} -sV  -p {port} --script "banner,(cassandra* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
 [cups]
 
@@ -30,7 +30,7 @@ serviceNames = [
 
 [[cups.scan]]
 name = 'nmap-cups'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(cups* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_cups_nmap.txt -oX {scandir}/xml/{protocol}_{port}_cups_nmap.xml {address}'
+command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(cups* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
 [distcc]
 
@@ -40,7 +40,7 @@ serviceNames = [
 
 [[distcc.scan]]
 name = 'nmap-distcc'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,distcc-cve2004-2687" --script-args "distcc-cve2004-2687.cmd=id" -oN {scandir}/{protocol}_{port}_distcc_nmap.txt -oX {scandir}/xml/{protocol}_{port}_distcc_nmap.xml {address}'
+command = 'nmap {nmap_extra} -sV -p {port} --script "banner,distcc-cve2004-2687" --script-args "distcc-cve2004-2687.cmd=id" {address}'
 
 [dns]
 
@@ -50,7 +50,7 @@ serviceNames = [
 
 [[dns.scan]]
 name = 'nmap-dns'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(dns* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_dns_nmap.txt -oX {scandir}/xml/{protocol}_{port}_dns_nmap.xml {address}'
+command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(dns* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
 [finger]
 
@@ -60,7 +60,7 @@ serviceNames = [
 
 [[finger.scan]]
 name = 'nmap-finger'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,finger" -oN {scandir}/{protocol}_{port}_finger_nmap.txt -oX {scandir}/xml/{protocol}_{port}_finger_nmap.xml {address}'
+command = 'nmap {nmap_extra} -sV -p {port} --script "banner,finger" {address}'
 
 [ftp]
 
@@ -69,20 +69,20 @@ serviceNames = [
   '^ftp\-data'
 ]
 
-[[ftp.scan]]
-name = 'nmap-ftp'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ftp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_ftp_nmap.txt -oX {scandir}/xml/{protocol}_{port}_ftp_nmap.xml {address}'
+  [[ftp.scan]]
+    name = 'nmap-ftp'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ftp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
-[[ftp.scan.pattern]]
-description = 'Anonymous FTP Enabled!'
-pattern = 'Anonymous FTP login allowed'
+  [[ftp.scan.pattern]]
+    description = 'Anonymous FTP Enabled!'
+    pattern = 'Anonymous FTP login allowed'
 
-[[ftp.manual]]
-description = 'Bruteforce logins:'
-commands = [
-  'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} -o "{scandir}/{protocol}_{port}_ftp_hydra.txt" ftp://{address}',
-  'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -O "{scandir}/{protocol}_{port}_ftp_medusa.txt" -M ftp -h {address}'
-]
+  [[ftp.manual]]
+    description = 'Bruteforce logins:'
+    commands = [
+    'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} ftp://{address}',
+    'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -M ftp -h {address}'
+    ]
 
 [http]
 
@@ -96,7 +96,7 @@ ignore-serviceNames = [
 
 [[http.scan]]
 name = 'nmap-http'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(http* or ssl*) and not (brute or broadcast or dos or external or http-slowloris* or fuzzer)" -oN {scandir}/{protocol}_{port}_http_nmap.txt -oX {scandir}/xml/{protocol}_{port}_{scheme}_nmap.xml {address}'
+command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(http* or ssl*) and not (brute or broadcast or dos or external or http-slowloris* or fuzzer)" {address}'
 
 [[http.scan.pattern]]
 description = 'Identified HTTP Server: {match}'
@@ -127,7 +127,7 @@ command = 'whatweb --color=never --no-errors -a 3 -v {scheme}://{address}:{port}
 
 [[http.scan]]
 name = 'feroxbuster'
-command = 'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n -o {scandir}/{protocol}_{port}_{scheme}_feroxbuster.txt'
+command = 'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n '
 
 [[http.manual]]
 description = '(nikto) old but generally reliable web server enumeration tool'
@@ -138,8 +138,8 @@ commands = [
 [[http.manual]]
 description = '(feroxbuster) Multi-threaded recursive directory/file enumeration for web servers using various wordlists:'
 commands = [
-  'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/big.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n -o {scandir}/{protocol}_{port}_{scheme}_feroxbuster_big.txt',
-  'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n -o {scandir}/{protocol}_{port}_{scheme}_feroxbuster_dirbuster.txt'
+  'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/big.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n ',
+  'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n '
 ]
 
 [[http.manual]]
@@ -179,10 +179,10 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
         [[http.manual]]
         description = "Credential bruteforcing commands (don't run these without modifying them):"
         commands = [
-          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} -o "{scandir}/{protocol}_{port}_{scheme}_auth_hydra.txt" {scheme}-get://{address}/path/to/auth/area',
-          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -O "{scandir}/{protocol}_{port}_{scheme}_auth_medusa.txt" -M http -h {address} -m DIR:/path/to/auth/area',
-          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} -o "{scandir}/{protocol}_{port}_{scheme}_form_hydra.txt" {scheme}-post-form://{address}/path/to/login.php:username=^USER^&password=^PASS^:invalid-login-message',
-          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -O "{scandir}/{protocol}_{port}_{scheme}_form_medusa.txt" -M web-form -h {address} -m FORM:/path/to/login.php -m FORM-DATA:"post?username=&password=" -m DENY-SIGNAL:"invalid login message"',
+          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} {scheme}-get://{address}/path/to/auth/area',
+          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -M http -h {address} -m DIR:/path/to/auth/area',
+          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} {scheme}-post-form://{address}/path/to/login.php:username=^USER^&password=^PASS^:invalid-login-message',
+          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -m DENY-SIGNAL:"invalid login message"',
         ]
 
         [imap]
@@ -193,7 +193,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[imap.scan]]
         name = 'nmap-imap'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(imap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_imap_nmap.txt -oX {scandir}/xml/{protocol}_{port}_imap_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(imap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [kerberos]
 
@@ -204,7 +204,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[kerberos.scan]]
         name = 'nmap-kerberos'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,krb5-enum-users" -oN {scandir}/{protocol}_{port}_kerberos_nmap.txt -oX {scandir}/xml/{protocol}_{port}_kerberos_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,krb5-enum-users" {address}'
 
         [ldap]
 
@@ -214,7 +214,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[ldap.scan]]
         name = 'nmap-ldap'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ldap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_ldap_nmap.txt -oX {scandir}/xml/{protocol}_{port}_ldap_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ldap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [[ldap.scan]]
         name = 'enum4linux'
@@ -237,7 +237,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[mongodb.scan]]
         name = 'nmap-mongodb'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mongodb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_mongodb_nmap.txt -oX {scandir}/xml/{protocol}_{port}_mongodb_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mongodb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [mssql]
 
@@ -248,7 +248,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[mssql.scan]]
         name = 'nmap-mssql'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ms-sql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "mssql.instance-port={port},mssql.username=sa,mssql.password=sa" -oN {scandir}/{protocol}_{port}_mssql_nmap.txt -oX {scandir}/xml/{protocol}_{port}_mssql_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ms-sql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "mssql.instance-port={port},mssql.username=sa,mssql.password=sa" {address}'
 
         [[mssql.manual]]
         description = '(sqsh) interactive database shell'
@@ -264,7 +264,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[mysql.scan]]
         name = 'nmap-mysql'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_mysql_nmap.txt -oX {scandir}/xml/{protocol}_{port}_mysql_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [nfs]
 
@@ -275,7 +275,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[nfs.scan]]
         name = 'nmap-nfs'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_nfs_nmap.txt -oX {scandir}/xml/{protocol}_{port}_nfs_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [[nfs.scan]]
         name = 'showmount'
@@ -289,7 +289,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[nntp.scan]]
         name = 'nmap-nntp'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,nntp-ntlm-info" -oN {scandir}/{protocol}_{port}_nntp_nmap.txt -oX {scandir}/xml/{protocol}_{port}_nntp_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,nntp-ntlm-info" {address}'
 
         [oracle]
 
@@ -299,7 +299,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[oracle.scan]]
         name = 'nmap-oracle'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(oracle* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_oracle_nmap.txt -oX {scandir}/xml/{protocol}_{port}_oracle_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(oracle* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [[oracle.scan]]
         name = 'oracle-tnscmd-ping'
@@ -319,7 +319,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[oracle.manual]]
         description = 'Brute-force SIDs using Nmap'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,oracle-sid-brute" -oN {scandir}/{protocol}_{port}_oracle_sid-brute_nmap.txt -oX {scandir}/xml/{protocol}_{port}_oracle_sid-brute_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,oracle-sid-brute" {address}'
 
         [[oracle.manual]]
         description = 'Install ODAT (https://github.com/quentinhardy/odat) and run the following commands:'
@@ -338,7 +338,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
           'patator oracle_login host={address} port={port} user=COMBO00 password=COMBO01 0=/usr/share/seclists/Passwords/Default-Credentials/oracle-betterdefaultpasslist.txt -x ignore:code=ORA-01017 -x ignore:code=ORA-28000'
         ]
 
-        [pop3]
+[pop3]
 
         serviceNames = [
           '^pop3'
@@ -346,7 +346,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[pop3.scan]]
         name = 'nmap-pop3'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(pop3* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_pop3_nmap.txt -oX {scandir}/xml/{protocol}_{port}_pop3_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(pop3* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [rdp]
 
@@ -358,13 +358,13 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[rdp.scan]]
         name = 'nmap-rdp'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(rdp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_rdp_nmap.txt -oX {scandir}/xml/{protocol}_{port}_rdp_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(rdp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [[rdp.manual]]
         description = 'Bruteforce logins:'
         commands = [
-          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} -o "{scandir}/{protocol}_{port}_rdp_hydra.txt" rdp://{address}',
-          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -O "{scandir}/{protocol}_{port}_rdp_medusa.txt" -M rdp -h {address}'
+          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} rdp://{address}',
+          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -M rdp -h {address}'
         ]
 
         [rmi]
@@ -376,7 +376,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[rmi.scan]]
         name = 'nmap-rmi'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,rmi-vuln-classloader,rmi-dumpregistry" -oN {scandir}/{protocol}_{port}_rmi_nmap.txt -oX {scandir}/xml/{protocol}_{port}_rmi_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,rmi-vuln-classloader,rmi-dumpregistry" {address}'
 
         [rpc]
 
@@ -388,7 +388,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[rpc.scan]]
         name = 'nmap-msrpc'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,msrpc-enum,rpc-grind,rpcinfo" -oN {scandir}/{protocol}_{port}_rpc_nmap.txt -oX {scandir}/xml/{protocol}_{port}_rpc_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,msrpc-enum,rpc-grind,rpcinfo" {address}'
 
         [[rpc.manual]]
         description = 'RPC Client:'
@@ -404,7 +404,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[sip.scan]]
         name = 'nmap-sip'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,sip-enum-users,sip-methods" -oN {scandir}/{protocol}_{port}_sip_nmap.txt -oX {scandir}/xml/{protocol}_{port}_sip_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,sip-enum-users,sip-methods" {address}'
 
         [[sip.scan]]
         name = 'svwar'
@@ -418,13 +418,13 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[ssh.scan]]
         name = 'nmap-ssh'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,ssh2-enum-algos,ssh-hostkey,ssh-auth-methods" -oN {scandir}/{protocol}_{port}_ssh_nmap.txt -oX {scandir}/xml/{protocol}_{port}_ssh_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,ssh2-enum-algos,ssh-hostkey,ssh-auth-methods" {address}'
 
         [[ssh.manual]]
         description = 'Bruteforce logins:'
         commands = [
-          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} -o "{scandir}/{protocol}_{port}_ssh_hydra.txt" ssh://{address}',
-          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -O "{scandir}/{protocol}_{port}_ssh_medusa.txt" -M ssh -h {address}'
+          'hydra -L "{usernameWordlist}" -P "{passwordWordlist}" -e nsr -s {port} ssh://{address}',
+          'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -M ssh -h {address}'
         ]
         [smb]
 
@@ -436,7 +436,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[smb.scan]]
         name = 'nmap-smb'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(nbstat or smb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "unsafe=1" -oN {scandir}/{protocol}_{port}_smb_nmap.txt -oX {scandir}/xml/{protocol}_{port}_smb_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(nbstat or smb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "unsafe=1" {address}'
 
         [[smb.scan]]
         name = 'enum4linux'
@@ -472,9 +472,9 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
         [[smb.manual]]
         description = 'Nmap scans for SMB vulnerabilities that could potentially cause a DoS if scanned (according to Nmap). Be careful:'
         commands = [
-          'nmap {nmap_extra} -sV -p {port} --script "smb-vuln-ms06-025" --script-args "unsafe=1" -oN {scandir}/{protocol}_{port}_smb_ms06-025.txt -oX {scandir}/xml/{protocol}_{port}_smb_ms06-025.xml {address}',
-          'nmap {nmap_extra} -sV -p {port} --script "smb-vuln-ms07-029" --script-args "unsafe=1" -oN {scandir}/{protocol}_{port}_smb_ms07-029.txt -oX {scandir}/xml/{protocol}_{port}_smb_ms07-029.xml {address}',
-          'nmap {nmap_extra} -sV -p {port} --script "smb-vuln-ms08-067" --script-args "unsafe=1" -oN {scandir}/{protocol}_{port}_smb_ms08-067.txt -oX {scandir}/xml/{protocol}_{port}_smb_ms08-067.xml {address}'
+          'nmap {nmap_extra} -sV -p {port} --script "smb-vuln-ms06-025" --script-args "unsafe=1" {address}',
+          'nmap {nmap_extra} -sV -p {port} --script "smb-vuln-ms07-029" --script-args "unsafe=1" {address}',
+          'nmap {nmap_extra} -sV -p {port} --script "smb-vuln-ms08-067" --script-args "unsafe=1" {address}'
         ]
 
         [smtp]
@@ -485,7 +485,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[smtp.scan]]
         name = 'nmap-smtp'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(smtp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_smtp_nmap.txt -oX {scandir}/xml/{protocol}_{port}_smtp_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(smtp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [[smtp.scan]]
         name = 'smtp-user-enum'
@@ -499,7 +499,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[snmp.scan]]
         name = 'nmap-snmp'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(snmp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN {scandir}/{protocol}_{port}_snmp-nmap.txt -oX {scandir}/xml/{protocol}_{port}_snmp_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(snmp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
         [[snmp.scan]]
         name = 'onesixtyone'
@@ -563,7 +563,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[telnet.scan]]
         name = 'nmap-telnet'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,telnet-encryption,telnet-ntlm-info" -oN {scandir}/{protocol}_{port}_telnet-nmap.txt -oX {scandir}/xml/{protocol}_{port}_telnet_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,telnet-encryption,telnet-ntlm-info" {address}'
 
         [tftp]
 
@@ -573,7 +573,7 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[tftp.scan]]
         name = 'nmap-tftp'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,tftp-enum" -oN {scandir}/{protocol}_{port}_tftp-nmap.txt -oX {scandir}/xml/{protocol}_{port}_tftp_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,tftp-enum" {address}'
 
         [vnc]
 
@@ -583,5 +583,5 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
 
         [[vnc.scan]]
         name = 'nmap-vnc'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(vnc* or realvnc* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "unsafe=1" -oN {scandir}/{protocol}_{port}_vnc_nmap.txt -oX {scandir}/xml/{protocol}_{port}_vnc_nmap.xml {address}'
+        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(vnc* or realvnc* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "unsafe=1" {address}'
 

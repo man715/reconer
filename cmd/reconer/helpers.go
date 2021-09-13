@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"gopkg.in/getlantern/deepcopy.v1"
 )
 
 // Sets the directory structure for each IP address
@@ -110,87 +112,86 @@ func insertServiceInfo(target *Target) {
 
 		switch serviceName {
 		case "apani1":
-			target.FoundPorts[index].Service.Scans = scanConfig.Cassandra.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Cassandra.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Cassandra.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Cassandra.Manuals)
 		case "ipp":
-			target.FoundPorts[index].Service.Scans = scanConfig.Cups.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Cups.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Cups.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Cups.Manuals)
 		case "distccd":
-			target.FoundPorts[index].Service.Scans = scanConfig.Distcc.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Distcc.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Distcc.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Distcc.Manuals)
 		case "domain":
-			target.FoundPorts[index].Service.Scans = scanConfig.Finger.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Finger.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Finger.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Finger.Manuals)
 		case "ftp", "ftp-data":
-			target.FoundPorts[index].Service.Scans = scanConfig.FTP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.FTP.Manuals
-		case "http":
-			target.FoundPorts[index].Service.Scans = scanConfig.HTTP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.HTTP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.FTP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.FTP.Manuals)
+		case "http", "https", "ssl/http":
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.HTTP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.HTTP.Manuals)
 		case "imap":
-			target.FoundPorts[index].Service.Scans = scanConfig.IMAP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.IMAP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.IMAP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.IMAP.Manuals)
 		case "kerberos", "kpasswd":
-			target.FoundPorts[index].Service.Scans = scanConfig.Kerberos.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Kerberos.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Kerberos.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Kerberos.Manuals)
 		case "ldap":
-			target.FoundPorts[index].Service.Scans = scanConfig.LDAP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.LDAP.Manuals
-			fmt.Println("LDAP")
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.LDAP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.LDAP.Manuals)
 		case "mongod":
-			target.FoundPorts[index].Service.Scans = scanConfig.Mongodb.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Mongodb.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Mongodb.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Mongodb.Manuals)
 		case "mssql", "ms-sql":
-			target.FoundPorts[index].Service.Scans = scanConfig.MSSQL.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.MSSQL.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.MSSQL.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.MSSQL.Manuals)
 		case "mysql":
-			target.FoundPorts[index].Service.Scans = scanConfig.MYSQL.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.MYSQL.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.MYSQL.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.MYSQL.Manuals)
 		case "nfs", "rpcbind":
-			target.FoundPorts[index].Service.Scans = scanConfig.NFS.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.NFS.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.NFS.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.NFS.Manuals)
 		case "nntp":
-			target.FoundPorts[index].Service.Scans = scanConfig.NTP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.NTP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.NTP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.NTP.Manuals)
 		case "oracle":
-			target.FoundPorts[index].Service.Scans = scanConfig.Oracle.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Oracle.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Oracle.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Oracle.Manuals)
 		case "pop3":
-			target.FoundPorts[index].Service.Scans = scanConfig.POP3.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.POP3.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.POP3.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.POP3.Manuals)
 		case "rdp", "ms-wbt-server", "ms-term-serv":
-			target.FoundPorts[index].Service.Scans = scanConfig.RDP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.RDP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.RDP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.RDP.Manuals)
 		case "java-rmi", "rmiregistry":
-			target.FoundPorts[index].Service.Scans = scanConfig.RMI.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.RMI.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.RMI.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.RMI.Manuals)
 		case "msrpc", "erpc":
-			target.FoundPorts[index].Service.Scans = scanConfig.RPC.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.RPC.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.RPC.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.RPC.Manuals)
 		case "asterisk":
-			target.FoundPorts[index].Service.Scans = scanConfig.SIP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.SIP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.SIP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.SIP.Manuals)
 		case "ssh":
-			target.FoundPorts[index].Service.Scans = scanConfig.SSH.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.SSH.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.SSH.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.SSH.Manuals)
 		case "smb", "microsoft-ds", "netbios":
-			target.FoundPorts[index].Service.Scans = scanConfig.SMB.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.SMB.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.SMB.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.SMB.Manuals)
 		case "smtp":
-			target.FoundPorts[index].Service.Scans = scanConfig.SMTP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.SMTP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.SMTP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.SMTP.Manuals)
 		case "snmp":
-			target.FoundPorts[index].Service.Scans = scanConfig.SNMP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.SNMP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.SNMP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.SNMP.Manuals)
 		case "telent":
-			target.FoundPorts[index].Service.Scans = scanConfig.Telnet.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.Telnet.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.Telnet.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.Telnet.Manuals)
 		case "tftp":
-			target.FoundPorts[index].Service.Scans = scanConfig.TFTP.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.TFTP.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.TFTP.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.TFTP.Manuals)
 		case "vnc":
-			target.FoundPorts[index].Service.Scans = scanConfig.VNC.Scans
-			target.FoundPorts[index].Service.Manuals = scanConfig.VNC.Manuals
+			deepcopy.Copy(&target.FoundPorts[index].Service.Scans, scanConfig.VNC.Scans)
+			deepcopy.Copy(&target.FoundPorts[index].Service.Manuals, scanConfig.VNC.Manuals)
 		}
 	}
 
@@ -230,9 +231,6 @@ func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]i
 			var stderr bytes.Buffer
 			progAndArgs := splitCommand(command)
 
-			if progAndArgs[0] == "nmap" {
-				fmt.Printf("%#v", progAndArgs)
-			}
 			prog := progAndArgs[0]
 			tmpArgs := progAndArgs[1:]
 			args := []string{}
@@ -243,7 +241,7 @@ func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]i
 			} else {
 				args = tmpArgs
 			}
-			log.Printf("Running: %v %v\n", prog, args)
+			//log.Printf("Running: %v %v\n", prog, args)
 			cmd := exec.Command(prog, args...)
 			cmd.Stdout = &out
 			cmd.Stderr = &stderr
@@ -284,7 +282,7 @@ func runCommand(enumJobs <-chan map[string]string, outStream chan<- map[string]i
 					outStream <- cmdOutput
 					errStream <- cmdErr
 				} else {
-					log.Println(prog + args[0] + " finished on " + ip)
+					//					log.Println(prog + args[0] + " finished on " + ip)
 					cmdOutput := make(map[string]interface{})
 					cmdOutput[name] = cmd.Stdout
 					outStream <- cmdOutput

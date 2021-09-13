@@ -41,10 +41,10 @@ type Service struct {
 }
 
 type Scan struct {
-	Name     string
-	Command  string
-	Patterns []Pattern `mapstructure:"pattern"`
-	RunOnce  string    `mapstructure:"run_once"`
+	Name    string
+	Command string
+	Pattern Pattern `mapstructure:"pattern"`
+	RunOnce string  `mapstructure:"run_once"`
 }
 
 type Pattern struct {
