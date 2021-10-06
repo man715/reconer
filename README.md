@@ -28,4 +28,7 @@ go get -v github.com/man715/reconer/cmd/reconer
 ```
 This will install the reconer tool but not the TOML configurations. You will need to download them or build them yourself and put them in the directory you are running the tool from. Yes, this is not convenient as you have to have multiple configuration files or you need to keep moving your configuration files around.
 
+This will install reconer at `/home/<USERNAME>/go/bin/` so you will need to make sure that is in your PATH.
 
+# Questions
+If you have any questions, feel free to ask. If you want to work on this tool feel free to fork it and submit pull requests but I really don't know a whole lot about development or Git in general so it may take me some time to figure it out.
