@@ -8,9 +8,9 @@ serviceNames = [
   '.+'
 ]
 
-[[all-services.scan]]
-name = 'sslscan'
-command = 'bash -c if [ "{secure}" == "True" ]; then sslscan --show-certificate --no-colour {address}:{port} ; fi'
+  [[all-services.scan]]
+    name = 'sslscan'
+    command = 'bash -c if [ "{secure}" == "True" ]; then sslscan --show-certificate --no-colour {address}:{port} ; fi'
 
 [cassandra]
 
@@ -18,9 +18,9 @@ serviceNames = [
   '^apani1'
 ]
 
-[[cassandra.scan]]
-name = 'nmap-cassandra'
-command = 'nmap {nmap_extra} -sV  -p {port} --script "banner,(cassandra* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[cassandra.scan]]
+    name = 'nmap-cassandra'
+    command = 'nmap {nmap_extra} -sV  -p {port} --script "banner,(cassandra* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
 [cups]
 
@@ -28,9 +28,9 @@ serviceNames = [
   '^ipp'
 ]
 
-[[cups.scan]]
-name = 'nmap-cups'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(cups* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[cups.scan]]
+    name = 'nmap-cups'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(cups* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
 [distcc]
 
@@ -38,9 +38,9 @@ serviceNames = [
   '^distccd'
 ]
 
-[[distcc.scan]]
-name = 'nmap-distcc'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,distcc-cve2004-2687" --script-args "distcc-cve2004-2687.cmd=id" {address}'
+  [[distcc.scan]]
+    name = 'nmap-distcc'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,distcc-cve2004-2687" --script-args "distcc-cve2004-2687.cmd=id" {address}'
 
 [dns]
 
@@ -48,9 +48,9 @@ serviceNames = [
   '^domain'
 ]
 
-[[dns.scan]]
-name = 'nmap-dns'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(dns* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[dns.scan]]
+    name = 'nmap-dns'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(dns* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
 [finger]
 
@@ -58,9 +58,9 @@ serviceNames = [
   '^finger'
 ]
 
-[[finger.scan]]
-name = 'nmap-finger'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,finger" {address}'
+  [[finger.scan]]
+    name = 'nmap-finger'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,finger" {address}'
 
 [ftp]
 
@@ -94,86 +94,86 @@ ignore-serviceNames = [
   '^nacn_http$'
 ]
 
-[[http.scan]]
-name = 'nmap-http'
-command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(http* or ssl*) and not (brute or broadcast or dos or external or http-slowloris* or fuzzer)" {address}'
+  [[http.scan]]
+    name = 'nmap-http'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(http* or ssl*) and not (brute or broadcast or dos or external or http-slowloris* or fuzzer)" {address}'
 
-[[http.scan.pattern]]
-description = 'Identified HTTP Server: {match}'
-pattern = 'Server: ([^\n]+)'
+  [[http.scan.pattern]]
+    description = 'Identified HTTP Server: {match}'
+    pattern = 'Server: ([^\n]+)'
 
-[[http.scan.pattern]]
-description = 'WebDAV is enabled'
-pattern = 'WebDAV is ENABLED'
+  [[http.scan.pattern]]
+    description = 'WebDAV is enabled'
+    pattern = 'WebDAV is ENABLED'
 
-[[http.scan]]
-name = 'curl-index'
-command = 'curl -sSik {scheme}://{address}:{port}/ -m 10 '
+  [[http.scan]]
+    name = 'curl-index'
+    command = 'curl -sSik {scheme}://{address}:{port}/ -m 10 '
 
-[[http.scan.pattern]]
-pattern = '(?i)Powered by [^\n]+'
+  [[http.scan.pattern]]
+    pattern = '(?i)Powered by [^\n]+'
 
-[[http.scan]]
-name = 'curl-robots'
-command = 'curl -sSik {scheme}://{address}:{port}/robots.txt -m 10 '
+  [[http.scan]]
+    name = 'curl-robots'
+    command = 'curl -sSik {scheme}://{address}:{port}/robots.txt -m 10 '
 
-[[http.scan]]
-name = 'wkhtmltoimage'
-command = 'bash -c if hash wkhtmltoimage 2> /dev/null; then wkhtmltoimage --format png {scheme}://{address}:{port}/ {scandir}/{protocol}_{port}_{scheme}_screenshot.png; fi'
+  [[http.scan]]
+    name = 'wkhtmltoimage'
+    command = 'bash -c if hash wkhtmltoimage 2> /dev/null; then wkhtmltoimage --format png {scheme}://{address}:{port}/ {scandir}/{protocol}_{port}_{scheme}_screenshot.png; fi'
 
-[[http.scan]]
-name = 'whatweb'
-command = 'whatweb --color=never --no-errors -a 3 -v {scheme}://{address}:{port} '
+  [[http.scan]]
+    name = 'whatweb'
+    command = 'whatweb --color=never --no-errors -a 3 -v {scheme}://{address}:{port} '
 
-[[http.scan]]
-name = 'feroxbuster'
-command = 'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n '
-
-[[http.manual]]
-description = '(nikto) old but generally reliable web server enumeration tool'
-commands = [
-  'nikto -ask=no -h {scheme}://{address}:{port} '
-]
-
-[[http.manual]]
-description = '(feroxbuster) Multi-threaded recursive directory/file enumeration for web servers using various wordlists:'
-commands = [
-  'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/big.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n ',
-  'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n '
-]
-
-[[http.manual]]
-description = '(dirsearch) Multi-threaded recursive directory/file enumeration for web servers using various wordlists:'
-commands = [
-  'dirsearch -u {scheme}://{address}:{port}/ -t 16 -r -e txt,html,php,asp,aspx,jsp -f -w /usr/share/seclists/Discovery/Web-Content/big.txt --plain-text-report="{scandir}/{protocol}_{port}_{scheme}_dirsearch_big.txt"',
-  'dirsearch -u {scheme}://{address}:{port}/ -t 16 -r -e txt,html,php,asp,aspx,jsp -f -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --plain-text-report="{scandir}/{protocol}_{port}_{scheme}_dirsearch_dirbuster.txt"'
-]
-
-[[http.manual]]
-description = '(dirb) Recursive directory/file enumeration for web servers using various wordlists (same as dirsearch above):'
-  commands = [
-  'dirb {scheme}://{address}:{port}/ /usr/share/seclists/Discovery/Web-Content/big.txt -l -r -S -X ",.txt,.html,.php,.asp,.aspx,.jsp" -o "{scandir}/{protocol}_{port}_{scheme}_dirb_big.txt"',
-  'dirb {scheme}://{address}:{port}/ /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -l -r -S -X ",.txt,.html,.php,.asp,.aspx,.jsp" -o "{scandir}/{protocol}_{port}_{scheme}_dirb_dirbuster.txt"'
-  ]
+  [[http.scan]]
+    name = 'feroxbuster'
+    command = 'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n '
 
   [[http.manual]]
-  description = '(gobuster v3) Directory/file enumeration for web servers using various wordlists (same as dirb above):'
+    description = '(nikto) old but generally reliable web server enumeration tool'
     commands = [
-    'gobuster dir -u {scheme}://{address}:{port}/ -w /usr/share/seclists/Discovery/Web-Content/big.txt -e -k -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -z -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_big.txt"',
-    'gobuster dir -u {scheme}://{address}:{port}/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -e -k -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -z -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_dirbuster.txt"'
+      'nikto -ask=no -h {scheme}://{address}:{port} '
+    ]
+
+  [[http.manual]]
+    description = '(feroxbuster) Multi-threaded recursive directory/file enumeration for web servers using various wordlists:'
+    commands = [
+      'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/seclists/Discovery/Web-Content/big.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n ',
+      'feroxbuster -u {scheme}://{address}:{port} -t 10 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -v -k -n '
+    ]
+
+  [[http.manual]]
+    description = '(dirsearch) Multi-threaded recursive directory/file enumeration for web servers using various wordlists:'
+    commands = [
+      'dirsearch -u {scheme}://{address}:{port}/ -t 16 -r -e txt,html,php,asp,aspx,jsp -f -w /usr/share/seclists/Discovery/Web-Content/big.txt --plain-text-report="{scandir}/{protocol}_{port}_{scheme}_dirsearch_big.txt"',
+      'dirsearch -u {scheme}://{address}:{port}/ -t 16 -r -e txt,html,php,asp,aspx,jsp -f -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --plain-text-report="{scandir}/{protocol}_{port}_{scheme}_dirsearch_dirbuster.txt"'
+    ]
+
+  [[http.manual]]
+    description = '(dirb) Recursive directory/file enumeration for web servers using various wordlists (same as dirsearch above):'
+    commands = [
+      'dirb {scheme}://{address}:{port}/ /usr/share/seclists/Discovery/Web-Content/big.txt -l -r -S -X ",.txt,.html,.php,.asp,.aspx,.jsp" -o "{scandir}/{protocol}_{port}_{scheme}_dirb_big.txt"',
+      'dirb {scheme}://{address}:{port}/ /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -l -r -S -X ",.txt,.html,.php,.asp,.aspx,.jsp" -o "{scandir}/{protocol}_{port}_{scheme}_dirb_dirbuster.txt"'
+    ]
+
+  [[http.manual]]
+    description = '(gobuster v3) Directory/file enumeration for web servers using various wordlists (same as dirb above):'
+    commands = [
+     'gobuster dir -u {scheme}://{address}:{port}/ -w /usr/share/seclists/Discovery/Web-Content/big.txt -e -k -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -z -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_big.txt"',
+     'gobuster dir -u {scheme}://{address}:{port}/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -e -k -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -z -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_dirbuster.txt"'
     ]
 
     [[http.manual]]
-    description = '(gobuster v1 & v2) Directory/file enumeration for web servers using various wordlists (same as dirb above):'
+      description = '(gobuster v1 & v2) Directory/file enumeration for web servers using various wordlists (same as dirb above):'
       commands = [
-      'gobuster -u {scheme}://{address}:{port}/ -w /usr/share/seclists/Discovery/Web-Content/big.txt -e -k -l -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_big.txt"',
-      'gobuster -u {scheme}://{address}:{port}/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -e -k -l -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_dirbuster.txt"'
-      ]
+        'gobuster -u {scheme}://{address}:{port}/ -w /usr/share/seclists/Discovery/Web-Content/big.txt -e -k -l -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_big.txt"',
+        'gobuster -u {scheme}://{address}:{port}/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -e -k -l -s "200,204,301,302,307,403,500" -x "txt,html,php,asp,aspx,jsp" -o "{scandir}/{protocol}_{port}_{scheme}_gobuster_dirbuster.txt"'
+       ]
 
       [[http.manual]]
-      description = '(wpscan) WordPress Security Scanner (useful if WordPress is found):'
+        description = '(wpscan) WordPress Security Scanner (useful if WordPress is found):'
         commands = [
-        'wpscan --url {scheme}://{address}:{port}/ --no-update -e vp,vt,tt,cb,dbe,u,m --plugins-detection aggressive --plugins-version-detection aggressive -f cli-no-color '
+          'wpscan --url {scheme}://{address}:{port}/ --no-update -e vp,vt,tt,cb,dbe,u,m --plugins-detection aggressive --plugins-version-detection aggressive -f cli-no-color '
         ]
 
         [[http.manual]]
@@ -185,133 +185,133 @@ description = '(dirb) Recursive directory/file enumeration for web servers using
           'medusa -U "{usernameWordlist}" -P "{passwordWordlist}" -e ns -n {port} -m DENY-SIGNAL:"invalid login message"',
         ]
 
-        [imap]
+[imap]
 
-        serviceNames = [
-          '^imap'
-        ]
+serviceNames = [
+'^imap'
+]
 
-        [[imap.scan]]
-        name = 'nmap-imap'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(imap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[imap.scan]]
+    name = 'nmap-imap'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(imap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
-        [kerberos]
+[kerberos]
 
-        serviceNames = [
-          '^kerberos',
-          '^kpasswd'
-        ]
+serviceNames = [
+'^kerberos',
+'^kpasswd'
+]
 
-        [[kerberos.scan]]
-        name = 'nmap-kerberos'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,krb5-enum-users" {address}'
+  [[kerberos.scan]]
+    name = 'nmap-kerberos'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,krb5-enum-users" {address}'
 
-        [ldap]
+[ldap]
 
-        serviceNames = [
-          '^ldap'
-        ]
+serviceNames = [
+'^ldap'
+]
 
-        [[ldap.scan]]
-        name = 'nmap-ldap'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ldap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[ldap.scan]]
+    name = 'nmap-ldap'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ldap* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
-        [[ldap.scan]]
-        name = 'enum4linux'
-        command = 'enum4linux -a -M -l -d {address} '
-        run_once = true
-        ports.tcp = [139, 389, 445]
-        ports.udp = [137]
+  [[ldap.scan]]
+    name = 'enum4linux'
+    command = 'enum4linux -a -M -l -d {address} '
+    run_once = true
+    ports.tcp = [139, 389, 445]
+    ports.udp = [137]
 
-        [[ldap.manual]]
-        description = 'ldapsearch command (modify before running)'
-        commands = [
-          'ldapsearch -x -D "<username>" -w "<password>"" -p {port} -h {address} -b "dc=example,dc=com" -s sub "(objectclass=*) '
-        ]
+  [[ldap.manual]]
+    description = 'ldapsearch command (modify before running)'
+    commands = [
+      'ldapsearch -x -D "<username>" -w "<password>"" -p {port} -h {address} -b "dc=example,dc=com" -s sub "(objectclass=*) '
+    ]
 
-        [mongodb]
+[mongodb]
 
-        serviceNames = [
-          '^mongod'
-        ]
+serviceNames = [
+'^mongod'
+]
 
-        [[mongodb.scan]]
-        name = 'nmap-mongodb'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mongodb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[mongodb.scan]]
+    name = 'nmap-mongodb'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mongodb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
-        [mssql]
+[mssql]
 
-        serviceNames = [
-          '^mssql',
-          '^ms\-sql'
-        ]
+serviceNames = [
+'^mssql',
+'^ms\-sql'
+]
 
-        [[mssql.scan]]
-        name = 'nmap-mssql'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ms-sql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "mssql.instance-port={port},mssql.username=sa,mssql.password=sa" {address}'
+  [[mssql.scan]]
+    name = 'nmap-mssql'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(ms-sql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args "mssql.instance-port={port},mssql.username=sa,mssql.password=sa" {address}'
 
-        [[mssql.manual]]
-        description = '(sqsh) interactive database shell'
-        commands = [
-          'sqsh -U <username> -P <password> -S {address}:{port}'
-        ]
+  [[mssql.manual]]
+    description = '(sqsh) interactive database shell'
+    commands = [
+      'sqsh -U <username> -P <password> -S {address}:{port}'
+    ]
 
-        [mysql]
+[mysql]
 
-        serviceNames = [
-          '^mysql'
-        ]
+serviceNames = [
+'^mysql'
+]
 
-        [[mysql.scan]]
-        name = 'nmap-mysql'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[mysql.scan]]
+    name = 'nmap-mysql'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
-        [nfs]
+[nfs]
 
-        serviceNames = [
-          '^nfs',
-          '^rpcbind'
-        ]
+serviceNames = [
+'^nfs',
+'^rpcbind'
+]
 
-        [[nfs.scan]]
-        name = 'nmap-nfs'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[nfs.scan]]
+  name = 'nmap-nfs'
+  command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(rpcinfo or nfs*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
-        [[nfs.scan]]
-        name = 'showmount'
-        command = 'showmount -e {address} '
+  [[nfs.scan]]
+    name = 'showmount'
+    command = 'showmount -e {address} '
 
-        [nntp]
+[nntp]
 
-        serviceNames = [
-          '^nntp'
-        ]
+serviceNames = [
+'^nntp'
+]
 
-        [[nntp.scan]]
-        name = 'nmap-nntp'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,nntp-ntlm-info" {address}'
+  [[nntp.scan]]
+    name = 'nmap-nntp'
+    command = 'nmap {nmap_extra} -sV -p {port} --script "banner,nntp-ntlm-info" {address}'
 
-        [oracle]
+[oracle]
 
-        serviceNames = [
-          '^oracle'
-        ]
+serviceNames = [
+'^oracle'
+]
 
-        [[oracle.scan]]
-        name = 'nmap-oracle'
-        command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(oracle* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
+  [[oracle.scan]]
+  name = 'nmap-oracle'
+  command = 'nmap {nmap_extra} -sV -p {port} --script "banner,(oracle* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" {address}'
 
-        [[oracle.scan]]
-        name = 'oracle-tnscmd-ping'
-        command = 'tnscmd10g ping -h {address} -p {port} '
+  [[oracle.scan]]
+    name = 'oracle-tnscmd-ping'
+    command = 'tnscmd10g ping -h {address} -p {port} '
 
-        [[oracle.scan]]
-        name = 'oracle-tnscmd-version'
-        command = 'tnscmd10g version -h {address} -p {port} '
+  [[oracle.scan]]
+  name = 'oracle-tnscmd-version'
+  command = 'tnscmd10g version -h {address} -p {port} '
 
-        [[oracle.scan]]
-        name = 'oracle-tnscmd-version'
-        command = 'tnscmd10g version -h {address} -p {port} '
+  [[oracle.scan]]
+  name = 'oracle-tnscmd-version'
+  command = 'tnscmd10g version -h {address} -p {port} '
 
         [[oracle.scan]]
         name = 'oracle-scanner'

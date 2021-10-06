@@ -313,7 +313,7 @@ func writeFile(streamType string, outStream <-chan map[string]interface{}, targe
 			if name == "manual" {
 				output = output.(string) + "\n"
 			}
-			outFilename := name + ".txt"
+			outFilename := name + ".md"
 			if streamType == "err" {
 				outFilename = "err_" + outFilename
 			}

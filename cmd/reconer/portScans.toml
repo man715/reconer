@@ -2,12 +2,12 @@
 
         [[default.scan]]
 				name = "nmapFullTCPServiceDetection"
-        command = "nmap {nmap_extra} -sC -sV -A --osscan-guess --version-all -p 80,443 {address}"
+        command = "nmap {nmap_extra} -sC -sV -A -p- -Pn --open {address}"
         pattern = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
 
         [[default.scan]]
 				name = "nmapTop20UDPServiceDetection"
-        command = "nmap {nmap_extra} -sU -A --top-ports=20 --version-all {address}"
+        command = "nmap {nmap_extra} -sU -A --top-ports=20 --version-all --open -Pn {address}"
         pattern = '^(?P<port>\d+)\/(?P<protocol>(tcp|udp))(.*)open(\s*)(?P<service>[\w\-\/]+)(\s*)(.*)$'
 
 [quick]
